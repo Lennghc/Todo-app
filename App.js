@@ -1,42 +1,53 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Home from './Components/Home';
 
 import { Container } from './assets/appStyles';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AppLoading from 'expo-app-loading';
+
+import * as SplashScreen from 'expo-splash-screen';
 
 
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [ready, setReady] = useState(false);
-
   const initialTodas = [];
-
   const [todos, setTodos] = useState(initialTodas);
 
-  const loadTodos = () => {    
-    AsyncStorage.getItem("storedTodos").then(data => {
-      if (data !== null) {
-        setTodos(JSON.parse(data))
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await AsyncStorage.getItem("storedTodos").then(data => {
+          if (data !== null) {
+            setTodos(JSON.parse(data))
+          }
+        })
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setReady(true);
       }
-    }).catch((error) => console.log(error));
-  }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (ready) {
+      await SplashScreen.hideAsync();
+    }
+  }, [ready]);
 
   if (!ready) {
-    return (
-      <AppLoading
-        startAsync={loadTodos}
-        onFinish={() => setReady(true)}
-        onError={console.warn}
-      />
-    );
+    return null;
   }
 
+
   return (
-    <Container>
+    <Container onLayout={onLayoutRootView}>
       <Home todos={todos} setTodos={setTodos} />
       <StatusBar style='light' />
     </Container>
