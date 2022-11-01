@@ -7,6 +7,10 @@ import InputModal from './InputModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ todos, setTodos }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [todoInputValue, setTodoInputValue] = useState();
+    const [todoToBeEdited, setTodoToBeEdited] = useState(null);
+
 
     const handleClearTodos = () => {
         try {
@@ -16,10 +20,6 @@ const Home = ({ todos, setTodos }) => {
             console.log(error)
         }
     }
-
-    const [modalVisible, setModalVisible] = useState(false);
-    const [todoInputValue, setTodoInputValue] = useState();
-
 
     const handleAddTodo = (todo) => {
         const newTodos = [...todos, todo];
@@ -32,8 +32,6 @@ const Home = ({ todos, setTodos }) => {
             console.log(error);
         }
     }
-
-    const [todoToBeEdited, setTodoToBeEdited] = useState(null);
 
     const handleTriggerEdit = (item) => {
         setTodoToBeEdited(item);
